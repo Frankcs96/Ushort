@@ -18,7 +18,6 @@ public class Url {
   private long id;
 
   @Column(nullable = false)
-  @URL
   private String longUrl;
 
   @Column(nullable = false)
