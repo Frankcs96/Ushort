@@ -20,7 +20,7 @@ public class Url {
   @Column(nullable = false)
   private String longUrl;
 
-  @Column(nullable = false)
+
   private String shortUrl;
 
   @Column(nullable = false)
