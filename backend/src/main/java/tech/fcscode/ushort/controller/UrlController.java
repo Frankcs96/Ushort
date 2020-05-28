@@ -1,6 +1,8 @@
 package tech.fcscode.ushort.controller;
 
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,6 @@ public class UrlController {
   private UrlService urlService;
 
 
-
   @Autowired
   public UrlController(UrlRepository urlRepository, UrlService urlService) {
     this.urlRepository = urlRepository;
@@ -36,26 +37,26 @@ public class UrlController {
 
   @PostMapping("/")
   public ResponseEntity<?> createUrl(@RequestBody Url url) {
-    if(url != null) {
-      url.setCreatedDate(new Date());
-      url.setExpirationDate(new Date());
+    if (!url.getLongUrl().isEmpty()) {
+      url.setCreatedDate(LocalDateTime.now());
+      url.setExpirationDate(urlService.getExpirationDate(url.getCreatedDate()));
       urlRepository.save(url);
       String shortUrl = urlService.generateShortUrl(url);
       url.setShortUrl(shortUrl);
       urlRepository.save(url);
-
       return ResponseEntity.status(201).body(url);
     }
 
-    return ResponseEntity.noContent().build();
+    throw new ResponseStatusException(
+        HttpStatus.BAD_REQUEST, "You have to enter a valid URL"
+    );
 
   }
 
 
   @GetMapping("/{shortUrl}")
-    public ResponseEntity<?> getLongUrl(@PathVariable String shortUrl) {
+  public ResponseEntity<?> getLongUrl(@PathVariable String shortUrl) {
 
-    // transform shortUrl in ID
     Long id = urlService.getIdFromShortUrl(shortUrl);
 
     Url url = urlRepository.findById(id).orElse(null);
