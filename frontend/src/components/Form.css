@@ -67,3 +67,11 @@ button:hover {
     box-shadow: none;
 }
 
+.result-container {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+
+}
+
+

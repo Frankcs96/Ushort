@@ -1,10 +1,13 @@
 package tech.fcscode.ushort.controller;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 import tech.fcscode.ushort.model.Url;
 import tech.fcscode.ushort.repository.UrlRepository;
 import tech.fcscode.ushort.service.UrlService;
@@ -47,6 +51,7 @@ public class UrlController {
       return ResponseEntity.status(201).body(url);
     }
 
+
     throw new ResponseStatusException(
         HttpStatus.BAD_REQUEST, "You have to enter a valid URL"
     );
@@ -55,20 +60,15 @@ public class UrlController {
 
 
   @GetMapping("/{shortUrl}")
-  public ResponseEntity<?> getLongUrl(@PathVariable String shortUrl) {
+  public ModelAndView getLongUrl(@PathVariable String shortUrl)  {
 
     Long id = urlService.getIdFromShortUrl(shortUrl);
 
-    Url url = urlRepository.findById(id).orElse(null);
+    Url url = urlRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+        HttpStatus.NOT_FOUND, "URL NOT FOUND"
+    ));
 
-    if (url == null) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND, "URL not found"
-      );
-    }
-
-    return ResponseEntity.ok(url);
-
+    return new ModelAndView("redirect:" + url.getLongUrl());
   }
 
 
