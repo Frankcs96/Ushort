@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ import tech.fcscode.ushort.service.UrlService;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000","https://frankcs96.github.io"})
 public class UrlController {
 
 
@@ -41,7 +42,11 @@ public class UrlController {
 
   @PostMapping("/")
   public ResponseEntity<?> createUrl(@RequestBody Url url) {
-    if (!url.getLongUrl().isEmpty()) {
+
+    url.setLongUrl(urlService.checkProtocol(url.getLongUrl()));
+
+    if (urlService.checkIfUrlIsValid(url.getLongUrl())) {
+
       url.setCreatedDate(LocalDateTime.now());
       url.setExpirationDate(urlService.getExpirationDate(url.getCreatedDate()));
       urlRepository.save(url);
@@ -49,6 +54,7 @@ public class UrlController {
       url.setShortUrl(shortUrl);
       urlRepository.save(url);
       return ResponseEntity.status(201).body(url);
+
     }
 
 
