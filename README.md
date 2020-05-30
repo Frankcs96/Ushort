@@ -2,6 +2,8 @@
 
 Url shortener project for practice different technologies.
 
+Link: https://frankcs96.github.io/Ushort/
+
 Frontend: React.js
 
 Backend: Java Spring
